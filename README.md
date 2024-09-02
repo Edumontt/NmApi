@@ -15,6 +15,8 @@
   - (syn): Executa uma varredura SYN.
   
   - (fin): Executa uma varredura FIN.
+ 
+  - (exec): Executa comando no sistema. (Cuidado)
 
 ## 🚀 Utilização
 - Para utilizar a API, é necessário iniciar o servidor Flask e realizar as requisições HTTP para o endpoint /api/nmap.
